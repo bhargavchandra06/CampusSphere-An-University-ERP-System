@@ -12,8 +12,8 @@ Spring Boot REST API Project
 
 ## Tech Stack
 
-- Java 17
+- Java 25
 - Spring Boot
 - Spring Data JPA
-- H2 Database
+- MySQL Database
 - ModelMapper
