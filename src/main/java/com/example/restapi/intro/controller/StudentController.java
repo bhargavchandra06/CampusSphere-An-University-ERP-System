@@ -1,0 +1,72 @@
+package com.example.restapi.intro.controller;
+
+import com.example.restapi.intro.dto.StudentDto;
+import com.example.restapi.intro.entity.StudentEntity;
+import com.example.restapi.intro.exceptions.ResourceNotFoundException;
+import com.example.restapi.intro.respository.StudentRepository;
+import com.example.restapi.intro.service.StudentService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+
+@RestController
+@RequestMapping("/student")
+public class StudentController {
+  private final StudentService studentService;
+
+    public StudentController(StudentService studentService) {
+        this.studentService = studentService;
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<StudentDto> getStudent(@PathVariable Integer id)
+    {
+        Optional<StudentDto> studentDto =  studentService.getStudentbyId(id);
+        return studentDto
+                .map(ResponseEntity::ok).orElseThrow(()-> new ResourceNotFoundException("Student not found with id : "+id));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<StudentDto>> getallStudents(@RequestParam(required = false) Integer id,@RequestParam(required = false) String name)
+    {
+        return ResponseEntity.ok(studentService.getAllStudents());
+    }
+    @PostMapping
+    public ResponseEntity<StudentDto> createStudent(@RequestBody @Valid StudentDto studentDto)
+    {
+
+        StudentDto saved_student = studentService.createNewstudent(studentDto);
+        return new ResponseEntity<>(saved_student, HttpStatus.CREATED);
+    }
+    @PostMapping("/test")
+    public String test(@RequestBody StudentDto studentDto)
+    {
+        return studentDto.getName();
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<StudentDto> updateStudent(@RequestBody StudentDto studentDto,@PathVariable Integer id)
+    {
+        return ResponseEntity.ok(studentService.updateStudentbyId(id,studentDto));
+    }
+    @DeleteMapping("{id}")
+    public ResponseEntity<Boolean> delete(@PathVariable Integer id)
+    {
+        boolean gotDeleted = studentService.deletebyId(id);
+        if(gotDeleted) return ResponseEntity.ok(true);
+        return  ResponseEntity.notFound().build();
+    }
+    @PatchMapping("/{id}")
+    public ResponseEntity<StudentDto> update(@RequestBody Map<String,Object> mp,@PathVariable Integer id)
+    {
+        StudentDto studentDto = studentService.update_Partial(mp,id);
+        if(studentDto==null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(studentDto);
+    }
+}
