@@ -1,19 +1,24 @@
 # Student Management System
 
-Spring Boot REST API Project
+A Spring Boot REST API project for managing students.
 
 ## Features
 
 - CRUD Operations
 - DTO Mapping
 - Validation
-- Global Exception Handling
-- PATCH Support
+- Custom Exception Handling
+- Partial Updates (PATCH)
+- Sorting
+- Custom JPA Queries
+- MySQL Integration
 
 ## Tech Stack
 
 - Java 25
 - Spring Boot
 - Spring Data JPA
-- MySQL Database
+- MySQL
+- Maven
 - ModelMapper
+- Lombok
