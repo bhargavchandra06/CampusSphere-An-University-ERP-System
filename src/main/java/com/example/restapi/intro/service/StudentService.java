@@ -6,7 +6,9 @@ import com.example.restapi.intro.exceptions.ResourceNotFoundException;
 import com.example.restapi.intro.respository.StudentRepository;
 import lombok.Getter;
 import lombok.Setter;
+import org.jspecify.annotations.Nullable;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Sort;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -63,7 +65,6 @@ public class StudentService {
 
         return modelMapper.map(savedEntity, StudentDto.class);
     }
-
     public StudentDto updateStudentbyId(Integer id, StudentDto studentDto) {
         is_exit(id);
         StudentEntity existing =
@@ -120,5 +121,30 @@ public class StudentService {
                 saved,
                 StudentDto.class
         );
+    }
+
+    public List<StudentDto> getStudentsByAgeRange(Integer minAge, Integer maxAge) {
+        return studentRepository
+                .findByAgeGreaterThanAndAgeLessThan(minAge,maxAge)
+                .stream()
+                .map(student ->
+                        modelMapper.map(student,StudentDto.class))
+                .toList();
+    }
+
+    public List<StudentDto> sortStudents(
+            String field,
+            String direction
+    )
+    {
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(field).descending()
+                : Sort.by(field).ascending();
+
+        return studentRepository.findAll(sort)
+                .stream()
+                .map(student ->
+                        modelMapper.map(student, StudentDto.class))
+                .toList();
     }
 }

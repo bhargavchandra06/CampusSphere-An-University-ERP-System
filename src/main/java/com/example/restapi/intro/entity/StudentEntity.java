@@ -16,15 +16,15 @@ public class StudentEntity {
     private String email;
     private Integer age;
 
-    public Integer getPhonenumber() {
+    public String getPhonenumber() {
         return phonenumber;
     }
 
-    public void setPhonenumber(Integer phonenumber) {
+    public void setPhonenumber(String phonenumber) {
         this.phonenumber = phonenumber;
     }
-
-    private Integer phonenumber;
+    @Column(length = 10, nullable = false)
+    private String phonenumber;
 
 
     public int getAge() {

@@ -1,0 +1,3 @@
+--INSERT INTO students (id,name,email,age,phonenumber)
+--VALUES
+--(2,'aman','aman@gmail.com',22,'1234567890');

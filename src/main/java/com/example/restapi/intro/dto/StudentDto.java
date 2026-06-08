@@ -2,6 +2,7 @@ package com.example.restapi.intro.dto;
 
 
 import com.example.restapi.intro.annotations.studentage;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 
 public class StudentDto {
@@ -19,15 +20,22 @@ public class StudentDto {
     @studentage
     private Integer age;
 
-    public Integer getPhonumber() {
+    public String getPhonenumber() {
         return phonenumber;
     }
 
-    public void setPhonumber(Integer phonenumber) {
+    public void setPhonenumber(String phonenumber) {
         this.phonenumber = phonenumber;
     }
+    @NotBlank(message = "Phone number Field is Required")
+    @Size(max = 10,message = "Maximum 10 number are allowed")
+    @Pattern(
+            regexp = "^[0-9]{10}$",
+            message = "Phone number must contain exactly 10 digits"
+    )
+    private String phonenumber;
 
-    private Integer phonenumber;
+
 
     public StudentDto() {
     }

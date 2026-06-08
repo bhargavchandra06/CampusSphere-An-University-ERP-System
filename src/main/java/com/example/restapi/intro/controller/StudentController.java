@@ -38,6 +38,27 @@ public class StudentController {
     {
         return ResponseEntity.ok(studentService.getAllStudents());
     }
+    @GetMapping("/check/age-range")
+    public ResponseEntity<List<StudentDto>> getStudentsByAgeRange(
+            @RequestParam Integer minAge,
+            @RequestParam Integer maxAge
+    )
+    {
+        return ResponseEntity.ok(studentService.getStudentsByAgeRange(
+                minAge,
+                maxAge
+        ));
+    }
+    @GetMapping("/sort")
+    public ResponseEntity<List<StudentDto>> sortStudents(
+            @RequestParam String field,
+            @RequestParam String direction
+    )
+    {
+        return ResponseEntity.ok(
+                studentService.sortStudents(field, direction)
+        );
+    }
     @PostMapping
     public ResponseEntity<StudentDto> createStudent(@RequestBody @Valid StudentDto studentDto)
     {
@@ -46,12 +67,12 @@ public class StudentController {
         return new ResponseEntity<>(saved_student, HttpStatus.CREATED);
     }
     @PostMapping("/test")
-    public String test(@RequestBody StudentDto studentDto)
+    public String test(@RequestBody @Valid StudentDto studentDto)
     {
         return studentDto.getName();
     }
     @PutMapping("/{id}")
-    public ResponseEntity<StudentDto> updateStudent(@RequestBody StudentDto studentDto,@PathVariable Integer id)
+    public ResponseEntity<StudentDto> updateStudent(@RequestBody @Valid StudentDto studentDto,@PathVariable Integer id)
     {
         return ResponseEntity.ok(studentService.updateStudentbyId(id,studentDto));
     }
