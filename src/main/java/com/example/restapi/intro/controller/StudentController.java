@@ -1,5 +1,6 @@
 package com.example.restapi.intro.controller;
 
+import com.example.restapi.intro.dto.DepartmentDto;
 import com.example.restapi.intro.dto.StudentDto;
 import com.example.restapi.intro.entity.StudentEntity;
 import com.example.restapi.intro.exceptions.ResourceNotFoundException;
@@ -59,6 +60,18 @@ public class StudentController {
                 studentService.sortStudents(field, direction)
         );
     }
+    @GetMapping("/{studentId}/department")
+    public ResponseEntity<DepartmentDto>
+    getDepartmentByStudentId(
+            @PathVariable Integer studentId
+    )
+    {
+        return ResponseEntity.ok(
+                studentService.getDepartmentByStudentId(
+                        studentId
+                )
+        );
+    }
     @PostMapping
     public ResponseEntity<StudentDto> createStudent(@RequestBody @Valid StudentDto studentDto)
     {
@@ -75,6 +88,32 @@ public class StudentController {
     public ResponseEntity<StudentDto> updateStudent(@RequestBody @Valid StudentDto studentDto,@PathVariable Integer id)
     {
         return ResponseEntity.ok(studentService.updateStudentbyId(id,studentDto));
+    }
+    @PutMapping("/{studentId}/address/{addressId}")
+    public ResponseEntity<StudentDto> assignAddress(
+            @PathVariable Integer studentId,
+            @PathVariable Long addressId
+    )
+    {
+        return ResponseEntity.ok(
+                studentService.assignAddress(
+                        studentId,
+                        addressId
+                )
+        );
+    }
+    @PutMapping("/{studentId}/department/{departmentId}")
+    public ResponseEntity<StudentDto> assignDepartment(
+            @PathVariable Integer studentId,
+            @PathVariable Long departmentId
+    )
+    {
+        return ResponseEntity.ok(
+                studentService.assignDepartment(
+                        studentId,
+                        departmentId
+                )
+        );
     }
     @DeleteMapping("{id}")
     public ResponseEntity<Boolean> delete(@PathVariable Integer id)

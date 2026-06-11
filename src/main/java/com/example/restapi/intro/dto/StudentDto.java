@@ -14,11 +14,40 @@ public class StudentDto {
     private String name;
     @Email(message = "Email Should be a Valid Email")
     private String email;
-//    @Max(value = 30,message = "Maximum Age should be 30")//Use @Max and @Min when you are dealing with Numbers
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    //    @Max(value = 30,message = "Maximum Age should be 30")//Use @Max and @Min when you are dealing with Numbers
 //    @Min(value = 18,message = "Minium Age should be 18")
     @Positive
     @studentage
     private Integer age;
+
+    private AddressDto address;
+
+    public DepartmentDto getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(DepartmentDto department) {
+        this.department = department;
+    }
+
+    private DepartmentDto department;
+
+    public AddressDto getAddress() {
+        return address;
+    }
+
+    public void setAddress(AddressDto address) {
+        this.address = address;
+    }
 
     public String getPhonenumber() {
         return phonenumber;
@@ -64,11 +93,5 @@ public class StudentDto {
         this.email = email;
     }
 
-    public int getAge() {
-        return age;
-    }
 
-    public void setAge(int age) {
-        this.age = age;
-    }
 }

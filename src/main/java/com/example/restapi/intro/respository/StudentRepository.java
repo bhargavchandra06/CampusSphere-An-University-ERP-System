@@ -27,5 +27,8 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Integer>
 //            nativeQuery = true
 //    )//(SQL)
     List<StudentEntity> findByAgeGreaterThanAndAgeLessThan(Integer minAge, Integer maxAge); // normally this will ,but it will not work for complex queries in that case you can Use @Query
-
+    List<StudentEntity>
+    findByDepartmentDepartmentName(
+            String departmentName
+    );
 }

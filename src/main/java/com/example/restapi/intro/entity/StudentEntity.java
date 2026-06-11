@@ -1,11 +1,14 @@
 package com.example.restapi.intro.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(name = "students")
@@ -14,6 +17,23 @@ public class StudentEntity {
     private int id;
     private String name;
     private String email;
+
+    @ManyToMany
+    @JoinTable(
+            name = "student_course",
+            joinColumns = @JoinColumn(name = "student_id"),
+            inverseJoinColumns = @JoinColumn(name = "course_id")
+    )
+    private List<CourseEntity> courses;
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
     private Integer age;
 
     public String getPhonenumber() {
@@ -26,14 +46,31 @@ public class StudentEntity {
     @Column(length = 10, nullable = false)
     private String phonenumber;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id")
+    @JsonManagedReference
+    private AddressEntity address;
 
-    public int getAge() {
-        return age;
+    public AddressEntity getAddress() {
+        return address;
     }
 
-    public void setAge(int age) {
-        this.age = age;
+    public void setAddress(AddressEntity address) {
+        this.address = address;
     }
+
+    public DepartmentEntity getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(DepartmentEntity department) {
+        this.department = department;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "department_id")
+    @JsonManagedReference
+    private DepartmentEntity department;
 
     public void setId(int id) {
         this.id = id;
