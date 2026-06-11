@@ -5,6 +5,7 @@ import com.example.restapi.intro.service.CourseService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.restapi.intro.dto.StudentDto;
 
 import java.util.List;
 import java.util.Map;
@@ -50,7 +51,18 @@ public class CourseController {
                 courseService.getCourseById(id)
         );
     }
-
+    @GetMapping("/{courseId}/students")
+    public ResponseEntity<List<StudentDto>>
+    getStudentsByCourse(
+            @PathVariable Long courseId
+    )
+    {
+        return ResponseEntity.ok(
+                courseService.getStudentsByCourse(
+                        courseId
+                )
+        );
+    }
     @PutMapping("/{id}")
     public ResponseEntity<CourseDto>
     updateCourse(

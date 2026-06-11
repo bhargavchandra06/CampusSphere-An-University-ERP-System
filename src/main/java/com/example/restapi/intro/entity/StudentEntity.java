@@ -2,20 +2,20 @@ package com.example.restapi.intro.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "students")
 public class StudentEntity {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     private String name;
+
     private String email;
 
     @ManyToMany
@@ -24,25 +24,10 @@ public class StudentEntity {
             joinColumns = @JoinColumn(name = "student_id"),
             inverseJoinColumns = @JoinColumn(name = "course_id")
     )
-    private List<CourseEntity> courses;
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
+    private List<CourseEntity> courses = new ArrayList<>();
 
     private Integer age;
 
-    public String getPhonenumber() {
-        return phonenumber;
-    }
-
-    public void setPhonenumber(String phonenumber) {
-        this.phonenumber = phonenumber;
-    }
     @Column(length = 10, nullable = false)
     private String phonenumber;
 
@@ -50,6 +35,38 @@ public class StudentEntity {
     @JoinColumn(name = "address_id")
     @JsonManagedReference
     private AddressEntity address;
+
+    @ManyToOne
+    @JoinColumn(name = "department_id")
+    @JsonManagedReference
+    private DepartmentEntity department;
+
+    public StudentEntity() {
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public List<CourseEntity> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(List<CourseEntity> courses) {
+        this.courses = courses;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public AddressEntity getAddress() {
         return address;
@@ -67,32 +84,27 @@ public class StudentEntity {
         this.department = department;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "department_id")
-    @JsonManagedReference
-    private DepartmentEntity department;
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getEmail() {
         return email;
     }
 
+    public Integer getAge() {
+        return age;
+    }
+
+    public String getPhonenumber() {
+        return phonenumber;
+    }
+
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public void setPhonenumber(String phonenumber) {
+        this.phonenumber = phonenumber;
     }
 }

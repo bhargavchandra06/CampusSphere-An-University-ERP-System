@@ -7,6 +7,9 @@ import com.example.restapi.intro.entity.DepartmentEntity;
 import com.example.restapi.intro.entity.StudentEntity;
 import com.example.restapi.intro.exceptions.ResourceNotFoundException;
 import com.example.restapi.intro.respository.AddressRepository;
+import com.example.restapi.intro.dto.CourseDto;
+import com.example.restapi.intro.entity.CourseEntity;
+import com.example.restapi.intro.respository.CourseRepository;
 import com.example.restapi.intro.respository.DepartmentRepository;
 import com.example.restapi.intro.respository.StudentRepository;
 import lombok.Getter;
@@ -32,14 +35,18 @@ public class StudentService {
  private final StudentRepository studentRepository;
  private final DepartmentRepository departmentRepository;
  private final AddressRepository addressRepository;
- private final ModelMapper modelMapper;
 
-    public StudentService(StudentRepository studentRepository, ModelMapper modelMapper, DepartmentRepository departmentRepository, AddressRepository addressRepository) {
-        this.studentRepository = studentRepository;
-        this.modelMapper = modelMapper;
+    public StudentService(StudentRepository studentRepository, DepartmentRepository departmentRepository, AddressRepository addressRepository, CourseRepository courseRepository, ModelMapper modelMapper) {
+            this.studentRepository = studentRepository;
         this.departmentRepository = departmentRepository;
         this.addressRepository = addressRepository;
+        this.courseRepository = courseRepository;
+        this.modelMapper = modelMapper;
     }
+
+    private final CourseRepository courseRepository;
+ private final ModelMapper modelMapper;
+
     public Optional<StudentDto> getStudentbyId(Integer id)
     {
         Optional<StudentEntity> studentEntity =  studentRepository.findById(id);
@@ -160,6 +167,62 @@ public class StudentService {
                 StudentDto.class
         );
     }
+    @Transactional
+    public StudentDto assignCourse(
+            Integer studentId,
+            Long courseId
+    )
+    {
+        StudentEntity student =
+                studentRepository.findById(studentId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Student not found with id : "
+                                                + studentId
+                                )
+                        );
+
+        CourseEntity course =
+                courseRepository.findById(courseId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Course not found with id : "
+                                                + courseId
+                                )
+                        );
+
+        student.getCourses().add(course);
+
+        return modelMapper.map(
+                student,
+                StudentDto.class
+        );
+    }
+    @Transactional
+    public StudentDto removeCourse(
+            Integer studentId,
+            Long courseId
+    )
+    {
+        StudentEntity student =
+                studentRepository.findById(studentId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Student not found with id : "
+                                                + studentId
+                                )
+                        );
+
+        student.getCourses()
+                .removeIf(course ->
+                        course.getId().equals(courseId));
+
+        return modelMapper.map(
+                student,
+                StudentDto.class
+        );
+    }
+
     public StudentDto update_Partial(Map<String, Object> mp, Integer id) {
 
          is_exit(id);
@@ -234,6 +297,28 @@ public class StudentService {
                 student.getDepartment(),
                 DepartmentDto.class
         );
+    }
+    public List<CourseDto> getCoursesByStudent(
+            Integer studentId
+    )
+    {
+        StudentEntity student =
+                studentRepository.findById(studentId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Student not found with id : "
+                                                + studentId
+                                )
+                        );
+
+        return student.getCourses()
+                .stream()
+                .map(course ->
+                        modelMapper.map(
+                                course,
+                                CourseDto.class
+                        ))
+                .toList();
     }
 
 }

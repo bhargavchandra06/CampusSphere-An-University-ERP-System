@@ -9,6 +9,7 @@ import com.example.restapi.intro.service.StudentService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import com.example.restapi.intro.dto.CourseDto;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -72,6 +73,17 @@ public class StudentController {
                 )
         );
     }
+    @GetMapping("/{studentId}/courses")
+    public ResponseEntity<List<CourseDto>> getCoursesByStudent(
+            @PathVariable Integer studentId
+    )
+    {
+        return ResponseEntity.ok(
+                studentService.getCoursesByStudent(
+                        studentId
+                )
+        );
+    }
     @PostMapping
     public ResponseEntity<StudentDto> createStudent(@RequestBody @Valid StudentDto studentDto)
     {
@@ -112,6 +124,32 @@ public class StudentController {
                 studentService.assignDepartment(
                         studentId,
                         departmentId
+                )
+        );
+    }
+    @PutMapping("/{studentId}/course/{courseId}")
+    public ResponseEntity<StudentDto> assignCourse(
+            @PathVariable Integer studentId,
+            @PathVariable Long courseId
+    )
+    {
+        return ResponseEntity.ok(
+                studentService.assignCourse(
+                        studentId,
+                        courseId
+                )
+        );
+    }
+    @DeleteMapping("/{studentId}/course/{courseId}")
+    public ResponseEntity<StudentDto> removeCourse(
+            @PathVariable Integer studentId,
+            @PathVariable Long courseId
+    )
+    {
+        return ResponseEntity.ok(
+                studentService.removeCourse(
+                        studentId,
+                        courseId
                 )
         );
     }

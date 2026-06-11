@@ -10,6 +10,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
+import com.example.restapi.intro.dto.StudentDto;
+import com.example.restapi.intro.entity.StudentEntity;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -169,5 +171,27 @@ public class CourseService {
                 course,
                 CourseDto.class
         );
+    }
+    public List<StudentDto> getStudentsByCourse(
+            Long courseId
+    )
+    {
+        CourseEntity course =
+                courseRepository.findById(courseId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Course not found with id : "
+                                                + courseId
+                                )
+                        );
+
+        return course.getStudents()
+                .stream()
+                .map(student ->
+                        modelMapper.map(
+                                student,
+                                StudentDto.class
+                        ))
+                .toList();
     }
 }
