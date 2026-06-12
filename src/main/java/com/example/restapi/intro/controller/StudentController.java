@@ -1,5 +1,5 @@
 package com.example.restapi.intro.controller;
-
+import org.springframework.data.domain.Page;
 import com.example.restapi.intro.dto.DepartmentDto;
 import com.example.restapi.intro.dto.StudentDto;
 import com.example.restapi.intro.entity.StudentEntity;
@@ -70,6 +70,31 @@ public class StudentController {
         return ResponseEntity.ok(
                 studentService.getDepartmentByStudentId(
                         studentId
+                )
+        );
+    }
+    @GetMapping("/page")
+    public ResponseEntity<Page<StudentDto>>
+    getStudentsWithPagination(
+            @RequestParam(defaultValue = "0")
+            Integer pageNumber,
+
+            @RequestParam(defaultValue = "5")
+            Integer pageSize,
+
+            @RequestParam(defaultValue = "id")
+            String sortBy,
+
+            @RequestParam(defaultValue = "asc")
+            String sortDirection
+    )
+    {
+        return ResponseEntity.ok(
+                studentService.getStudentsWithPagination(
+                        pageNumber,
+                        pageSize,
+                        sortBy,
+                        sortDirection
                 )
         );
     }

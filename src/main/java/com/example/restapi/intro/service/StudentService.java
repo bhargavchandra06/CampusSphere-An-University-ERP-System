@@ -12,6 +12,9 @@ import com.example.restapi.intro.entity.CourseEntity;
 import com.example.restapi.intro.respository.CourseRepository;
 import com.example.restapi.intro.respository.DepartmentRepository;
 import com.example.restapi.intro.respository.StudentRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import lombok.Getter;
 import lombok.Setter;
 import org.jspecify.annotations.Nullable;
@@ -278,6 +281,33 @@ public class StudentService {
                 .map(student ->
                         modelMapper.map(student, StudentDto.class))
                 .toList();
+    }
+    public Page<StudentDto> getStudentsWithPagination(
+            Integer pageNumber,
+            Integer pageSize,
+            String sortBy,
+            String sortDirection
+    )
+    {
+        Sort sort = sortDirection.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable =
+                PageRequest.of(
+                        pageNumber,
+                        pageSize,
+                        sort
+                );
+
+        Page<StudentEntity> students =
+                studentRepository.findAll(pageable);
+
+        return students.map(student ->
+                modelMapper.map(
+                        student,
+                        StudentDto.class
+                ));
     }
 
     public DepartmentDto getDepartmentByStudentId(
