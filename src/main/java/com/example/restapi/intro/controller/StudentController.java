@@ -1,15 +1,16 @@
 package com.example.restapi.intro.controller;
+import com.example.restapi.intro.dto.*;
+import com.example.restapi.intro.projections.StudentNameEmailProjection;
 import org.springframework.data.domain.Page;
-import com.example.restapi.intro.dto.DepartmentDto;
-import com.example.restapi.intro.dto.StudentDto;
 import com.example.restapi.intro.entity.StudentEntity;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import com.example.restapi.intro.exceptions.ResourceNotFoundException;
+import io.swagger.v3.oas.annotations.Operation;
 import com.example.restapi.intro.respository.StudentRepository;
 import com.example.restapi.intro.service.StudentService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import com.example.restapi.intro.dto.CourseDto;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,7 +18,10 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-
+@Tag(
+        name = "Student APIs",
+        description = "Operations related to students"
+)
 @RestController
 @RequestMapping("/student")
 public class StudentController {
@@ -27,6 +31,10 @@ public class StudentController {
         this.studentService = studentService;
     }
 
+    @Operation(
+            summary = "Get Student By Id",
+            description = "Returns a student using student id"
+    )
     @GetMapping("/{id}")
     public ResponseEntity<StudentDto> getStudent(@PathVariable Integer id)
     {
@@ -109,6 +117,36 @@ public class StudentController {
                 )
         );
     }
+    @GetMapping("/projection")
+    public ResponseEntity<List<StudentNameEmailProjection>>
+    getStudentProjection()
+    {
+        return ResponseEntity.ok(
+                studentService
+                        .getStudentNamesAndEmails()
+        );
+    }
+    @GetMapping("/filter")
+    public ResponseEntity<List<StudentDto>>
+    filterStudents(
+            @RequestParam(required = false)
+            String name,
+
+            @RequestParam(required = false)
+            Integer age,
+
+            @RequestParam(required = false)
+            String department
+    )
+    {
+        return ResponseEntity.ok(
+                studentService.filterStudents(
+                        name,
+                        age,
+                        department
+                )
+        );
+    }
     @PostMapping
     public ResponseEntity<StudentDto> createStudent(@RequestBody @Valid StudentDto studentDto)
     {
@@ -139,6 +177,33 @@ public class StudentController {
                 )
         );
     }
+    @GetMapping("/advice")
+    public ResponseEntity<String> getAdvice() throws Exception
+    {
+        return ResponseEntity.ok(
+                studentService.getAdvice()
+        );
+    }
+    @PutMapping("/{studentId}/address")
+    public ResponseEntity<StudentDto> assignNewAddress(
+            @PathVariable Integer studentId,
+            @RequestBody @Valid AddressDto addressDto
+    )
+    {
+        return ResponseEntity.ok(
+                studentService.assignNewAddress(
+                        studentId,
+                        addressDto
+                )
+        );
+    }@GetMapping("/external-user")
+    public ResponseEntity<UserDto> getExternalUser()
+    {
+        return ResponseEntity.ok(
+                studentService.getExternalUser()
+        );
+    }
+
     @PutMapping("/{studentId}/department/{departmentId}")
     public ResponseEntity<StudentDto> assignDepartment(
             @PathVariable Integer studentId,
@@ -192,4 +257,5 @@ public class StudentController {
         if(studentDto==null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(studentDto);
     }
+
 }

@@ -1,17 +1,19 @@
 package com.example.restapi.intro.service;
-
-import com.example.restapi.intro.dto.DepartmentDto;
-import com.example.restapi.intro.dto.StudentDto;
+import org.springframework.http.MediaType;
+import com.example.restapi.intro.dto.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.client.RestClient;
 import com.example.restapi.intro.entity.AddressEntity;
 import com.example.restapi.intro.entity.DepartmentEntity;
 import com.example.restapi.intro.entity.StudentEntity;
 import com.example.restapi.intro.exceptions.ResourceNotFoundException;
+import com.example.restapi.intro.projections.StudentNameEmailProjection;
 import com.example.restapi.intro.respository.AddressRepository;
-import com.example.restapi.intro.dto.CourseDto;
 import com.example.restapi.intro.entity.CourseEntity;
 import com.example.restapi.intro.respository.CourseRepository;
 import com.example.restapi.intro.respository.DepartmentRepository;
 import com.example.restapi.intro.respository.StudentRepository;
+import com.example.restapi.intro.specifications.StudentSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,7 @@ import lombok.Setter;
 import org.jspecify.annotations.Nullable;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.stereotype.Service;
@@ -38,17 +41,23 @@ public class StudentService {
  private final StudentRepository studentRepository;
  private final DepartmentRepository departmentRepository;
  private final AddressRepository addressRepository;
+    private final CourseRepository courseRepository;
 
-    public StudentService(StudentRepository studentRepository, DepartmentRepository departmentRepository, AddressRepository addressRepository, CourseRepository courseRepository, ModelMapper modelMapper) {
-            this.studentRepository = studentRepository;
+    public StudentService(StudentRepository studentRepository, DepartmentRepository departmentRepository, AddressRepository addressRepository, CourseRepository courseRepository, ObjectMapper objectMapper, ModelMapper modelMapper, RestClient restClient) {
+        this.studentRepository = studentRepository;
         this.departmentRepository = departmentRepository;
         this.addressRepository = addressRepository;
         this.courseRepository = courseRepository;
+        this.objectMapper = objectMapper;
         this.modelMapper = modelMapper;
+        this.restClient = restClient;
     }
 
-    private final CourseRepository courseRepository;
- private final ModelMapper modelMapper;
+    private final ObjectMapper objectMapper;
+
+
+    private final ModelMapper modelMapper;
+    private final RestClient restClient;
 
     public Optional<StudentDto> getStudentbyId(Integer id)
     {
@@ -70,19 +79,23 @@ public class StudentService {
    }
     public StudentDto createNewstudent(StudentDto studentDto)
     {
-        System.out.println("DTO: " + studentDto.getName());
-
         StudentEntity toSaveEntity =
                 modelMapper.map(studentDto, StudentEntity.class);
 
-        System.out.println("Mapped");
+        if(toSaveEntity.getAddress() != null)
+        {
+            toSaveEntity.getAddress()
+                    .setStudent(toSaveEntity);
+        }
 
         StudentEntity savedEntity =
                 studentRepository.save(toSaveEntity);
 
-        System.out.println("Saved");
+        return modelMapper.map(
+                savedEntity,
+                StudentDto.class
+        );
 
-        return modelMapper.map(savedEntity, StudentDto.class);
     }
     public StudentDto updateStudentbyId(Integer id, StudentDto studentDto) {
         is_exit(id);
@@ -351,4 +364,104 @@ public class StudentService {
                 .toList();
     }
 
+    public List<StudentNameEmailProjection>
+    getStudentNamesAndEmails()
+    {
+        return studentRepository
+                .findAllProjectedBy();
+    }
+
+    public List<StudentDto> filterStudents(
+            String name,
+            Integer age,
+            String department
+    )
+    {
+        Specification<StudentEntity> spec =
+                (root, query, cb) -> cb.conjunction();
+
+        if(name != null)
+        {
+            spec = spec.and(
+                    StudentSpecification.hasName(name)
+            );
+        }
+
+        if(age != null)
+        {
+            spec = spec.and(
+                    StudentSpecification.hasAge(age)
+            );
+        }
+
+        if(department != null)
+        {
+            spec = spec.and(
+                    StudentSpecification.hasDepartment(department)
+            );
+        }
+
+        return studentRepository.findAll(spec)
+                .stream()
+                .map(student ->
+                        modelMapper.map(
+                                student,
+                                StudentDto.class
+                        ))
+                .toList();
+    }
+    @Transactional
+    public StudentDto assignNewAddress(
+            Integer studentId,
+            AddressDto addressDto
+    )
+    {
+        StudentEntity student =
+                studentRepository.findById(studentId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Student not found with id : "
+                                                + studentId
+                                )
+                        );
+
+        AddressEntity address =
+                modelMapper.map(
+                        addressDto,
+                        AddressEntity.class
+                );
+
+        address.setStudent(student);
+        student.setAddress(address);
+
+        studentRepository.save(student);
+
+        return modelMapper.map(
+                student,
+                StudentDto.class
+        );
+    }
+    public String getAdvice() throws Exception
+    {
+        String response =
+                restClient.get()
+                        .uri("https://api.adviceslip.com/advice")
+                        .retrieve()
+                        .body(String.class);
+
+        AdviceResponseDto dto =
+                objectMapper.readValue(
+                        response,
+                        AdviceResponseDto.class
+                );
+
+        return dto.getSlip().getAdvice();
+    }
+    public UserDto getExternalUser()
+    {
+        return restClient.get()
+                .uri("https://jsonplaceholder.typicode.com/users/1")
+                .retrieve()
+                .body(UserDto.class);
+    }
 }

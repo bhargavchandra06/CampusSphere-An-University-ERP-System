@@ -4,11 +4,12 @@ import com.example.restapi.intro.entity.StudentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
+import com.example.restapi.intro.projections.StudentNameEmailProjection;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.List;
 
 @Repository
-public interface StudentRepository extends JpaRepository<StudentEntity, Integer> {
+public interface StudentRepository extends JpaRepository<StudentEntity, Integer>,JpaSpecificationExecutor<StudentEntity> {
 
 
     @Query("""
@@ -31,4 +32,7 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Integer>
     findByDepartmentDepartmentName(
             String departmentName
     );
+
+    List<StudentNameEmailProjection>
+    findAllProjectedBy();
 }

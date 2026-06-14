@@ -1,16 +1,15 @@
 package com.example.restapi.intro.configs;
 
-
-import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestClient;
 
 @Configuration
-public class MapperConfig {
-    @Bean
-    public ModelMapper getModelMapper()
-    {
-        return new ModelMapper();
+public class RestClientConfig {
 
+    @Bean
+    public RestClient restClient()
+    {
+        return RestClient.create();
     }
 }

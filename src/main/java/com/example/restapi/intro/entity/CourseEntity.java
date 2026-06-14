@@ -7,7 +7,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "courses")
-public class CourseEntity {
+public class CourseEntity extends AuditingBaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

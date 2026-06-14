@@ -8,10 +8,9 @@ import java.util.List;
 
 @Entity
 @Table(name = "students")
-public class StudentEntity {
+public class StudentEntity extends AuditingBaseEntity{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String name;
