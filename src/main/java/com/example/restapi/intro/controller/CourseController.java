@@ -4,6 +4,7 @@ import com.example.restapi.intro.dto.CourseDto;
 import com.example.restapi.intro.service.CourseService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.example.restapi.intro.dto.StudentDto;
 
@@ -16,13 +17,15 @@ public class CourseController {
 
     private final CourseService courseService;
 
+
     public CourseController(
             CourseService courseService
     ) {
         this.courseService = courseService;
     }
 
-    @PostMapping
+    @PostMapping("/create")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CourseDto> createCourse(
             @RequestBody @Valid CourseDto dto
     )
@@ -32,7 +35,10 @@ public class CourseController {
         );
     }
 
-    @GetMapping
+    @GetMapping("/all")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','FACULTY','STUDENT')"
+    )
     public ResponseEntity<List<CourseDto>>
     getAllCourses()
     {
@@ -42,6 +48,9 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','FACULTY','STUDENT')"
+    )
     public ResponseEntity<CourseDto>
     getCourseById(
             @PathVariable Long id
@@ -52,6 +61,9 @@ public class CourseController {
         );
     }
     @GetMapping("/{courseId}/students")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','FACULTY')"
+    )
     public ResponseEntity<List<StudentDto>>
     getStudentsByCourse(
             @PathVariable Long courseId
@@ -63,7 +75,24 @@ public class CourseController {
                 )
         );
     }
+    @GetMapping("/search")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','FACULTY','STUDENT')"
+    )
+    public ResponseEntity<List<CourseDto>>
+    searchCourses(
+            @RequestParam(defaultValue = "")
+            String keyword
+    )
+    {
+        return ResponseEntity.ok(
+                courseService.searchCourses(
+                        keyword
+                )
+        );
+    }
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CourseDto>
     updateCourse(
             @PathVariable Long id,
@@ -74,8 +103,24 @@ public class CourseController {
                 courseService.updateCourse(id,dto)
         );
     }
+    @PutMapping("/{courseId}/department/{departmentId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CourseDto> assignDepartment(
+            @PathVariable Long courseId,
+            @PathVariable Long departmentId
+    )
+    {
+        return ResponseEntity.ok(
+                courseService.assignDepartment(
+                        courseId,
+                        departmentId
+                )
+        );
+    }
+
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CourseDto>
     partialUpdate(
             @PathVariable Long id,
@@ -88,6 +133,7 @@ public class CourseController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Boolean>
     deleteCourse(
             @PathVariable Long id
@@ -99,6 +145,7 @@ public class CourseController {
     }
 
     @PutMapping("/{courseId}/faculty/{facultyId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CourseDto>
     assignFaculty(
             @PathVariable Long courseId,
@@ -109,6 +156,19 @@ public class CourseController {
                 courseService.assignFaculty(
                         courseId,
                         facultyId
+                )
+        );
+    }
+
+    @DeleteMapping("/{courseId}/faculty")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CourseDto> removeFaculty(
+            @PathVariable Long courseId
+    )
+    {
+        return ResponseEntity.ok(
+                courseService.removeFaculty(
+                        courseId
                 )
         );
     }

@@ -1,4 +1,4 @@
-package com.example.restapi.intro.auth;
+package com.example.restapi.intro.auth.service;
 
 import org.springframework.data.domain.AuditorAware;
 

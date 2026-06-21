@@ -141,6 +141,24 @@ public class DepartmentService {
                 DepartmentDto.class
         );
     }
+    public List<DepartmentDto> searchDepartments(
+            String keyword
+    )
+    {
+        return departmentRepository
+                .findByDepartmentNameContainingIgnoreCase(
+                        keyword
+                )
+                .stream()
+                .map(
+                        department ->
+                                modelMapper.map(
+                                        department,
+                                        DepartmentDto.class
+                                )
+                )
+                .toList();
+    }
 
     public List<StudentDto> getStudentsByDepartmentName(
             String departmentName

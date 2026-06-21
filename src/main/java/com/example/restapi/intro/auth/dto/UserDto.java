@@ -1,4 +1,4 @@
-package com.example.restapi.intro.dto;
+package com.example.restapi.intro.auth.dto;
 
 public class UserDto {
 

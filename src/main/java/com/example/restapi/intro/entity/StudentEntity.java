@@ -1,7 +1,10 @@
 package com.example.restapi.intro.entity;
 
+import com.example.restapi.intro.auth.entity.UserEntity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +20,18 @@ public class StudentEntity extends AuditingBaseEntity{
 
     private String email;
 
+    public String getRollNo() {
+        return rollNo;
+    }
+
+    public void setRollNo(String rollNo) {
+        this.rollNo = rollNo;
+    }
+
+    @Column(nullable = false, unique = true)
+    private String rollNo;
+
+
     @ManyToMany
     @JoinTable(
             name = "student_course",
@@ -25,6 +40,21 @@ public class StudentEntity extends AuditingBaseEntity{
     )
     private List<CourseEntity> courses = new ArrayList<>();
 
+    public Integer getYear() {
+        return year;
+    }
+
+    public void setYear(Integer year) {
+        this.year = year;
+    }
+
+    @Column(nullable = false)
+    @Min(value = 1)
+    @Max(value = 4)
+    private Integer year;
+
+    @Min(value = 18)
+    @Max(value = 30)
     private Integer age;
 
     @Column(length = 10, nullable = false)
@@ -35,6 +65,21 @@ public class StudentEntity extends AuditingBaseEntity{
     @JsonManagedReference
     private AddressEntity address;
 
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
+    }
+
+    @OneToOne
+    @JoinColumn(
+            name = "user_id",
+            unique = true
+    )
+    private UserEntity user;
+
     @ManyToOne
     @JoinColumn(name = "department_id")
     @JsonManagedReference
@@ -42,7 +87,6 @@ public class StudentEntity extends AuditingBaseEntity{
 
     public StudentEntity() {
     }
-
     public int getId() {
         return id;
     }

@@ -1,7 +1,14 @@
 package com.example.restapi.intro.service;
-import org.springframework.http.MediaType;
+import com.example.restapi.intro.auth.dto.UserDto;
+import com.example.restapi.intro.auth.entity.Role;
+import com.example.restapi.intro.auth.entity.UserEntity;
+import com.example.restapi.intro.auth.repository.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import com.example.restapi.intro.dto.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestClient;
 import com.example.restapi.intro.entity.AddressEntity;
 import com.example.restapi.intro.entity.DepartmentEntity;
@@ -19,11 +26,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import lombok.Getter;
 import lombok.Setter;
-import org.jspecify.annotations.Nullable;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -43,11 +48,16 @@ public class StudentService {
  private final AddressRepository addressRepository;
     private final CourseRepository courseRepository;
 
-    public StudentService(StudentRepository studentRepository, DepartmentRepository departmentRepository, AddressRepository addressRepository, CourseRepository courseRepository, ObjectMapper objectMapper, ModelMapper modelMapper, RestClient restClient) {
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public StudentService(AddressRepository addressRepository, StudentRepository studentRepository, DepartmentRepository departmentRepository, CourseRepository courseRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, ObjectMapper objectMapper, ModelMapper modelMapper, RestClient restClient) {
+        this.addressRepository = addressRepository;
         this.studentRepository = studentRepository;
         this.departmentRepository = departmentRepository;
-        this.addressRepository = addressRepository;
         this.courseRepository = courseRepository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
         this.objectMapper = objectMapper;
         this.modelMapper = modelMapper;
         this.restClient = restClient;
@@ -77,10 +87,38 @@ public class StudentService {
         }
         return studentDtos;
    }
-    public StudentDto createNewstudent(StudentDto studentDto)
-    {
+    @Transactional
+    public StudentDto createNewstudent(
+            StudentDto studentDto
+    ) {
+
+        if(userRepository.existsByUsername(
+                studentDto.getEmail()
+        )) {
+            throw new RuntimeException(
+                    "User already exists"
+            );
+        }
+
+        UserEntity user = UserEntity.builder()
+                .username(studentDto.getEmail())
+                .password(
+                        passwordEncoder.encode(
+                                "Temp@123"
+                        )
+                )
+                .role(Role.STUDENT)
+                .build();
+
+        userRepository.save(user);
+
         StudentEntity toSaveEntity =
-                modelMapper.map(studentDto, StudentEntity.class);
+                modelMapper.map(
+                        studentDto,
+                        StudentEntity.class
+                );
+
+        toSaveEntity.setUser(user);
 
         if(toSaveEntity.getAddress() != null)
         {
@@ -95,22 +133,149 @@ public class StudentService {
                 savedEntity,
                 StudentDto.class
         );
-
     }
-    public StudentDto updateStudentbyId(Integer id, StudentDto studentDto) {
-        is_exit(id);
+    public StudentDto getCurrentStudent()
+    {
+        Authentication authentication =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
+
+        String username =
+                authentication.getName();
+
+        StudentEntity student =
+                studentRepository
+                        .findByEmail(username)
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException(
+                                        "Student not found"
+                                )
+                        );
+
+        return modelMapper.map(
+                student,
+                StudentDto.class
+        );
+    }
+    public DepartmentDto getCurrentStudentDepartment()
+    {
+        String username =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getName();
+
+        StudentEntity student =
+                studentRepository
+                        .findByEmail(username)
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException(
+                                        "Student not found"
+                                )
+                        );
+
+        DepartmentEntity department =
+                student.getDepartment();
+
+        if(department == null)
+        {
+            throw new ResourceNotFoundException(
+                    "Department not assigned"
+            );
+        }
+
+        return modelMapper.map(
+                department,
+                DepartmentDto.class
+        );
+    }
+    public List<CourseDto> getCurrentStudentCourses()
+    {
+        Authentication authentication =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
+
+        String username =
+                authentication.getName();
+
+        StudentEntity student =
+                studentRepository
+                        .findByEmail(username)
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException(
+                                        "Student not found"
+                                )
+                        );
+
+        return student.getCourses()
+                .stream()
+                .map(
+                        course ->
+                                modelMapper.map(
+                                        course,
+                                        CourseDto.class
+                                )
+                )
+                .toList();
+    }
+    public StudentDto updateStudentbyId(
+            Integer id,
+            StudentDto studentDto
+    ) {
+
         StudentEntity existing =
                 studentRepository.findById(id)
                         .orElseThrow();
 
-        modelMapper.map(studentDto, existing);
+        existing.setRollNo(
+                studentDto.getRollNo()
+        );
 
-        existing.setId(id);
+        existing.setName(
+                studentDto.getName()
+        );
+
+        existing.setEmail(
+                studentDto.getEmail()
+        );
+
+        existing.setAge(
+                studentDto.getAge()
+        );
+
+        existing.setPhonenumber(
+                studentDto.getPhonenumber()
+        );
+
+        existing.setYear(
+                studentDto.getYear()
+        );
+
+        if (studentDto.getDepartment() != null) {
+
+            DepartmentEntity department =
+                    departmentRepository
+                            .findById(
+                                    studentDto.getDepartment().getId()
+                            )
+                            .orElseThrow();
+
+            existing.setDepartment(
+                    department
+            );
+        }
 
         StudentEntity saved =
-                studentRepository.save(existing);
+                studentRepository.save(
+                        existing
+                );
 
-        return modelMapper.map(saved, StudentDto.class);
+        return modelMapper.map(
+                saved,
+                StudentDto.class
+        );
     }
     public void is_exit(Integer id)
     {
@@ -207,10 +372,31 @@ public class StudentService {
                                 )
                         );
 
+        // Validation
+        if (!student.getDepartment()
+                .getId()
+                .equals(course.getDepartment().getId()))
+        {
+            throw new RuntimeException(
+                    "Student and Course belong to different departments"
+            );
+        }
+
+        // Avoid duplicate course assignment
+        if (student.getCourses().contains(course))
+        {
+            throw new RuntimeException(
+                    "Student already enrolled in this course"
+            );
+        }
+
         student.getCourses().add(course);
 
+        StudentEntity savedStudent =
+                studentRepository.save(student);
+
         return modelMapper.map(
-                student,
+                savedStudent,
                 StudentDto.class
         );
     }
@@ -341,6 +527,23 @@ public class StudentService {
                 DepartmentDto.class
         );
     }
+    public List<StudentDto> searchStudents(
+            String keyword
+    )
+    {
+        return studentRepository
+                .findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase(
+                        keyword,
+                        keyword
+                )
+                .stream()
+                .map(student ->
+                        modelMapper.map(
+                                student,
+                                StudentDto.class
+                        ))
+                .toList();
+    }
     public List<CourseDto> getCoursesByStudent(
             Integer studentId
     )
@@ -426,13 +629,28 @@ public class StudentService {
                         );
 
         AddressEntity address =
-                modelMapper.map(
-                        addressDto,
-                        AddressEntity.class
-                );
+                student.getAddress();
 
-        address.setStudent(student);
-        student.setAddress(address);
+        if (address == null)
+        {
+            address = new AddressEntity();
+
+            address.setStudent(student);
+
+            student.setAddress(address);
+        }
+
+        address.setCity(
+                addressDto.getCity()
+        );
+
+        address.setState(
+                addressDto.getState()
+        );
+
+        address.setPincode(
+                addressDto.getPincode()
+        );
 
         studentRepository.save(student);
 

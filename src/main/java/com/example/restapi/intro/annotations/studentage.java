@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD,ElementType.PARAMETER})
 @Constraint(validatedBy = {studentagevalidator.class})
 public @interface studentage {
-    String message() default "Student Id must be a prime number";
+    String message() default "Student Age must be between 18-30";
 
     Class<?>[] groups() default {};
 

@@ -5,6 +5,7 @@ import com.example.restapi.intro.dto.StudentDto;
 import com.example.restapi.intro.service.DepartmentService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +23,8 @@ public class DepartmentController {
         this.departmentService = departmentService;
     }
 
-    @PostMapping
+    @PostMapping("/create")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DepartmentDto> createDepartment(
             @RequestBody @Valid DepartmentDto dto
     )
@@ -32,7 +34,27 @@ public class DepartmentController {
         );
     }
 
-    @GetMapping
+    @GetMapping("/search")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','FACULTY','STUDENT')"
+    )
+    public ResponseEntity<List<DepartmentDto>>
+    searchDepartments(
+            @RequestParam(defaultValue = "")
+            String keyword
+    )
+    {
+        return ResponseEntity.ok(
+                departmentService.searchDepartments(
+                        keyword
+                )
+        );
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','FACULTY','STUDENT')"
+    )
     public ResponseEntity<List<DepartmentDto>>
     getAllDepartments()
     {
@@ -42,6 +64,9 @@ public class DepartmentController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','FACULTY','STUDENT')"
+    )
     public ResponseEntity<DepartmentDto>
     getDepartmentById(
             @PathVariable Long id
@@ -53,6 +78,9 @@ public class DepartmentController {
     }
 
     @GetMapping("/{departmentName}/students")
+    @PreAuthorize(
+            "hasAnyRole('ADMIN','FACULTY')"
+    )
     public ResponseEntity<List<StudentDto>>
     getStudentsByDepartmentName(
             @PathVariable String departmentName
@@ -67,6 +95,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DepartmentDto>
     updateDepartment(
             @PathVariable Long id,
@@ -82,6 +111,7 @@ public class DepartmentController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DepartmentDto>
     partialUpdate(
             @PathVariable Long id,
@@ -97,6 +127,7 @@ public class DepartmentController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Boolean>
     deleteDepartment(
             @PathVariable Long id

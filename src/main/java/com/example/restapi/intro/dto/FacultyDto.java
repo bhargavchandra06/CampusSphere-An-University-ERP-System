@@ -3,6 +3,8 @@ package com.example.restapi.intro.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.List;
+
 public class FacultyDto {
 
     private Long id;
@@ -13,8 +15,40 @@ public class FacultyDto {
     @Email(message = "Invalid email")
     private String email;
 
-    @NotBlank(message = "Specialization is required")
-    private String specialization;
+    public DepartmentDto getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(DepartmentDto department) {
+        this.department = department;
+    }
+
+    private DepartmentDto department;
+
+    public List<CourseSummaryDto> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(List<CourseSummaryDto> courses) {
+        this.courses = courses;
+    }
+
+    private List<CourseSummaryDto> courses;
+
+    public String getDesignation() {
+        return designation;
+    }
+
+    public void setDesignation(String designation) {
+        this.designation = designation;
+    }
+
+    @NotBlank(message = "Designation is required")
+    private String  designation;
+
+
+
+
 
     public FacultyDto() {
     }
@@ -31,9 +65,7 @@ public class FacultyDto {
         return email;
     }
 
-    public String getSpecialization() {
-        return specialization;
-    }
+
 
     public void setId(Long id) {
         this.id = id;
@@ -47,7 +79,5 @@ public class FacultyDto {
         this.email = email;
     }
 
-    public void setSpecialization(String specialization) {
-        this.specialization = specialization;
-    }
+
 }

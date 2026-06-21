@@ -3,6 +3,7 @@ package com.example.restapi.intro.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -19,6 +20,30 @@ public class DepartmentEntity extends AuditingBaseEntity{
     @OneToMany(mappedBy = "department")
     @JsonBackReference
     private List<StudentEntity> students;
+
+    public List<FacultyEntity> getFaculties() {
+        return faculties;
+    }
+
+    public void setFaculties(List<FacultyEntity> faculties) {
+        this.faculties = faculties;
+    }
+
+    @OneToMany(mappedBy = "department")
+    @JsonBackReference
+    private List<FacultyEntity> faculties = new ArrayList<>();
+
+    public List<CourseEntity> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(List<CourseEntity> courses) {
+        this.courses = courses;
+    }
+
+    @OneToMany(mappedBy = "department")
+    @JsonBackReference
+    private List<CourseEntity> courses = new ArrayList<>();
 
     public DepartmentEntity() {
     }

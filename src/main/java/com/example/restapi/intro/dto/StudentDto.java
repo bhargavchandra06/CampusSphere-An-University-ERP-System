@@ -5,12 +5,25 @@ import com.example.restapi.intro.annotations.studentage;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 
+import java.util.List;
+
 public class StudentDto {
 
 
     private int id;
+
+    public String getRollNo() {
+        return rollNo;
+    }
+
+    public void setRollNo(String rollNo) {
+        this.rollNo = rollNo;
+    }
+
+    @NotBlank(message = "Roll number is required")
+    private String rollNo;
     @NotBlank(message = "Name Field is Required")// for Strings use NotBlank
-    @Size(min = 3,max = 8,message = "Number of Characters should be minium - 3 and maximum-8")//use @Size When you are Dealing with Strings
+    @Size(min = 3,max = 15,message = "Number of Characters should be minium - 3 and maximum-15")//use @Size When you are Dealing with Strings
     private String name;
     @Email(message = "Email Should be a Valid Email")
     private String email;
@@ -41,6 +54,16 @@ public class StudentDto {
 
     private DepartmentDto department;
 
+    public List<CourseSummaryDto> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(List<CourseSummaryDto> courses) {
+        this.courses = courses;
+    }
+
+    private List<CourseSummaryDto> courses;
+
     public AddressDto getAddress() {
         return address;
     }
@@ -65,6 +88,18 @@ public class StudentDto {
     private String phonenumber;
 
 
+
+    public Integer getYear() {
+        return year;
+    }
+
+    public void setYear(Integer year) {
+        this.year = year;
+    }
+
+    @Min(value = 1, message = "Year should be at least 1")
+    @Max(value = 4, message = "Year cannot exceed 4")
+    private Integer year;
 
     public StudentDto() {
     }

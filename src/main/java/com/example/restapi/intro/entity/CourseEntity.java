@@ -26,6 +26,18 @@ public class CourseEntity extends AuditingBaseEntity{
     @JoinColumn(name = "faculty_id")
     private FacultyEntity faculty;
 
+    public DepartmentEntity getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(DepartmentEntity department) {
+        this.department = department;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "department_id")
+    private DepartmentEntity department;
+
     @ManyToMany(mappedBy = "courses")
     private List<StudentEntity> students = new ArrayList<>();
 

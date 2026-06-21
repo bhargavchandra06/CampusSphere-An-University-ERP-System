@@ -1,7 +1,7 @@
 package com.example.restapi.intro.configs;
 
 
-import com.example.restapi.intro.auth.AuditorAwareImpl;
+import com.example.restapi.intro.auth.service.AuditorAwareImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import com.example.restapi.intro.projections.StudentNameEmailProjection;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface StudentRepository extends JpaRepository<StudentEntity, Integer>,JpaSpecificationExecutor<StudentEntity> {
@@ -35,4 +36,15 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Integer>
 
     List<StudentNameEmailProjection>
     findAllProjectedBy();
+
+    Optional<StudentEntity> findByEmail(
+            String email
+    );
+
+    List<StudentEntity>
+    findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase(
+            String name,
+            String email
+    );
+
 }

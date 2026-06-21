@@ -2,6 +2,8 @@ package com.example.restapi.intro.dto;
 
 import jakarta.validation.constraints.*;
 
+import java.util.List;
+
 public class CourseDto {
 
     private Long id;
@@ -16,15 +18,37 @@ public class CourseDto {
     @Max(value = 6, message = "Credits cannot exceed 6")
     private Integer credits;
 
-    private FacultyDto faculty;
 
-    public FacultyDto getFaculty() {
+
+    public DepartmentDto getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(DepartmentDto department) {
+        this.department = department;
+    }
+
+    private DepartmentDto department;
+
+    public List<StudentSummaryDto> getStudents() {
+        return students;
+    }
+
+    public void setStudents(List<StudentSummaryDto> students) {
+        this.students = students;
+    }
+
+    private List<StudentSummaryDto> students;
+
+    public FacultySummaryDto getFaculty() {
         return faculty;
     }
 
-    public void setFaculty(FacultyDto faculty) {
+    public void setFaculty(FacultySummaryDto faculty) {
         this.faculty = faculty;
     }
+
+    private FacultySummaryDto faculty;
     public CourseDto() {
     }
 

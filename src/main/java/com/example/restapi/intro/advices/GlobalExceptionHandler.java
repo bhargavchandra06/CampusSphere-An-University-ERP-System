@@ -3,6 +3,7 @@ package com.example.restapi.intro.advices;
 import com.example.restapi.intro.exceptions.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +33,39 @@ public class GlobalExceptionHandler {
 
         ApiError apiError = ApiError.builder().status(HttpStatus.BAD_REQUEST).message("Input Validations Failed").suberrors(erorrs).build();
         return new ResponseEntity<>(apiError,HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiResponse<?>> handleBadCredentials(
+            BadCredentialsException ex
+    ) {
+
+        ApiError apiError =
+                ApiError.builder()
+                        .status(HttpStatus.UNAUTHORIZED)
+                        .message("Invalid Username or Password")
+                        .build();
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(
+                        new ApiResponse<>(apiError)
+                );
+    }
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ApiError> handleRuntimeException(
+            RuntimeException ex
+    )
+    {
+        ApiError apiError =
+                ApiError.builder()
+                        .status(HttpStatus.BAD_REQUEST)
+                        .message(ex.getMessage())
+                        .build();
+
+        return new ResponseEntity<>(
+                apiError,
+                HttpStatus.BAD_REQUEST
+        );
     }
 
 }

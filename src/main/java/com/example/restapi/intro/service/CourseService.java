@@ -2,9 +2,11 @@ package com.example.restapi.intro.service;
 
 import com.example.restapi.intro.dto.CourseDto;
 import com.example.restapi.intro.entity.CourseEntity;
+import com.example.restapi.intro.entity.DepartmentEntity;
 import com.example.restapi.intro.entity.FacultyEntity;
 import com.example.restapi.intro.exceptions.ResourceNotFoundException;
 import com.example.restapi.intro.respository.CourseRepository;
+import com.example.restapi.intro.respository.DepartmentRepository;
 import com.example.restapi.intro.respository.FacultyRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -23,11 +25,14 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final ModelMapper modelMapper;
 
-    public CourseService(CourseRepository courseRepository, ModelMapper modelMapper, FacultyRepository facultyRepository) {
+    public CourseService(CourseRepository courseRepository, ModelMapper modelMapper, DepartmentRepository departmentRepository, FacultyRepository facultyRepository) {
         this.courseRepository = courseRepository;
         this.modelMapper = modelMapper;
+        this.departmentRepository = departmentRepository;
         this.facultyRepository = facultyRepository;
     }
+
+    private final DepartmentRepository departmentRepository;
 
     private final FacultyRepository facultyRepository;
 
@@ -71,6 +76,37 @@ public class CourseService {
                 CourseDto.class
         );
     }
+    public CourseDto assignDepartment(
+            Long courseId,
+            Long departmentId
+    )
+    {
+        CourseEntity course =
+                courseRepository.findById(courseId)
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException(
+                                        "Course not found"
+                                )
+                        );
+
+        DepartmentEntity department =
+                departmentRepository.findById(departmentId)
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException(
+                                        "Department not found"
+                                )
+                        );
+
+        course.setDepartment(department);
+
+        CourseEntity savedCourse =
+                courseRepository.save(course);
+
+        return modelMapper.map(
+                savedCourse,
+                CourseDto.class
+        );
+    }
 
     @Transactional
     public CourseDto updateCourse(
@@ -97,6 +133,23 @@ public class CourseService {
                 course,
                 CourseDto.class
         );
+    }
+
+    public List<CourseDto> searchCourses(
+            String keyword
+    )
+    {
+        return courseRepository
+                .findByCourseNameContainingIgnoreCase(
+                        keyword
+                )
+                .stream()
+                .map(course ->
+                        modelMapper.map(
+                                course,
+                                CourseDto.class
+                        ))
+                .toList();
     }
 
     public boolean deleteCourse(Long id)
@@ -164,11 +217,52 @@ public class CourseService {
                                         "Faculty not found"
                                 )
                         );
-
+        if (!course.getDepartment()
+                .getId()
+                .equals(
+                        faculty.getDepartment()
+                                .getId()
+                ))
+        {
+            throw new RuntimeException(
+                    "Faculty and Course belong to different departments"
+            );
+        }
+        if (course.getFaculty() != null &&
+                course.getFaculty().getId().equals(facultyId))
+        {
+            throw new RuntimeException(
+                    "Faculty already assigned to this course"
+            );
+        }
         course.setFaculty(faculty);
 
         return modelMapper.map(
                 course,
+                CourseDto.class
+        );
+    }
+    @Transactional
+    public CourseDto removeFaculty(
+            Long courseId
+    )
+    {
+        CourseEntity course =
+                courseRepository.findById(courseId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Course not found with id : "
+                                                + courseId
+                                )
+                        );
+
+        course.setFaculty(null);
+
+        CourseEntity saved =
+                courseRepository.save(course);
+
+        return modelMapper.map(
+                saved,
                 CourseDto.class
         );
     }

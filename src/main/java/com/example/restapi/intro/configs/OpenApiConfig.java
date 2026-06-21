@@ -15,10 +15,10 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(
                         new Info()
-                                .title("Student Management System")
+                                .title("CampusSphere-University ERP System")
                                 .version("1.0")
                                 .description(
-                                        "Spring Boot REST API Project"
+                                        "Spring Boot Project"
                                 )
                 );
     }

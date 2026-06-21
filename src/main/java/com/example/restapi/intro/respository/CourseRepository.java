@@ -12,4 +12,11 @@ public interface CourseRepository
 
     List<CourseEntity>
     findByFacultyId(Long facultyId);
+
+    List<CourseEntity>
+    findByCourseNameContainingIgnoreCase(
+            String keyword
+    );
+
+
 }
