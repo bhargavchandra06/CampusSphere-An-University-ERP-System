@@ -9,6 +9,7 @@ import com.example.restapi.intro.auth.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -120,7 +121,11 @@ public class AuthService {
                                         "User not found"
                                 )
                         );
-
+        if (user.getRole() != request.getRole()) {
+            throw new BadCredentialsException(
+                    "Invalid role selected"
+            );
+        }
         String token =
                 jwtService.generateToken(user);
 

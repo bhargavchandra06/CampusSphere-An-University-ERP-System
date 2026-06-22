@@ -1,5 +1,6 @@
 package com.example.restapi.intro.auth.dto;
 
+import com.example.restapi.intro.auth.entity.Role;
 import jakarta.validation.constraints.NotBlank;
 
 public class LoginRequestDto {
@@ -25,4 +26,14 @@ public class LoginRequestDto {
 
     @NotBlank
     private String password;
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    private Role role;
 }
