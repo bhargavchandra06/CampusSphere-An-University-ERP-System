@@ -386,6 +386,20 @@ The following enhancements can further improve the scalability, performance, and
 * **AI-Powered Academic Assistant** – Assist students with academic information and course recommendations.
 
 
+## 📊 Project Highlights
+
+- Full-Stack University ERP System
+- Multi-Role Access (Admin, Faculty, Student)
+- JWT-Based Authentication & Authorization
+- RESTful API Architecture
+- Swagger API Documentation
+- AWS Cloud Deployment
+- HTTPS Enabled with Custom Domains
+- Amazon RDS MySQL Integration
+- CloudFront CDN Distribution
+- Production-Oriented Architecture
+
+
 ## 👨‍💻 Author
 
 ### Bhargav Chandra
