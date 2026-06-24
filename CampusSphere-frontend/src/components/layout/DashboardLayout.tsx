@@ -24,12 +24,7 @@ export function DashboardLayout({ title, allow, nav }: Props) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (user === null) return; // still hydrating in some flows
-    if (!user) {
-      router.navigate({ to: "/login" });
-      return;
-    }
-    if (user.role !== allow) {
+    if (!user || user.role !== allow) {
       router.navigate({ to: "/login" });
     }
   }, [user, allow, router]);
@@ -104,7 +99,7 @@ export function DashboardLayout({ title, allow, nav }: Props) {
 
       {/* Main */}
       <div className="flex min-w-0 flex-1 flex-col">
-       <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-card px-4 py-3 md:px-6">
+        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-card px-4 py-3 md:px-6">
           <Button
             variant="ghost"
             size="icon"
@@ -114,62 +109,48 @@ export function DashboardLayout({ title, allow, nav }: Props) {
           >
             <Menu className="h-5 w-5" />
           </Button>
-           <div className="flex items-center gap-3">
-  <Button
-    variant="ghost"
-    size="icon"
-    className="md:hidden"
-    onClick={() => setOpen((v) => !v)}
-    aria-label="Toggle navigation"
-  >
-    <Menu className="h-5 w-5" />
-  </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setOpen((v) => !v)}
+              aria-label="Toggle navigation"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
 
-  <h1 className="text-base font-semibold text-foreground md:text-lg">
-    {title}
-  </h1>
-</div>
+            <h1 className="text-base font-semibold text-foreground md:text-lg">{title}</h1>
+          </div>
           <div className="relative group">
+            <button className="flex items-center gap-3 rounded-xl border px-4 py-2 bg-card shadow-sm hover:bg-accent transition">
+              <div className="text-right">
+                <div className="text-sm font-semibold text-foreground">{user.name}</div>
 
-  <button className="flex items-center gap-3 rounded-xl border px-4 py-2 bg-card shadow-sm hover:bg-accent transition">
+                <div className="text-xs text-muted-foreground">{user.role}</div>
+              </div>
 
-    <div className="text-right">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">
+                {user.name.charAt(0).toUpperCase()}
+              </div>
+            </button>
 
-      <div className="text-sm font-semibold text-foreground">
-        {user.name}
-      </div>
+            <div className="absolute right-0 mt-2 hidden min-w-[180px] rounded-xl border bg-card shadow-lg group-hover:block">
+              <Link
+                to="/admin/profile"
+                className="block w-full px-4 py-3 text-left text-sm hover:bg-accent"
+              >
+                👤 Profile
+              </Link>
 
-      <div className="text-xs text-muted-foreground">
-        {user.role}
-      </div>
-
-    </div>
-
-    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold">
-      {user.name.charAt(0).toUpperCase()}
-    </div>
-
-  </button>
-
-  <div className="absolute right-0 mt-2 hidden min-w-[180px] rounded-xl border bg-card shadow-lg group-hover:block">
-
-    <Link
-      to="/admin/profile"
-      className="block w-full px-4 py-3 text-left text-sm hover:bg-accent"
-    >
-      👤 Profile
-    </Link>
-
-    <Link
-      to="/admin/change-password"
-      className="block w-full px-4 py-3 text-left text-sm hover:bg-accent"
-    >
-      🔒 Change Password
-    </Link>
-
-  </div>
-
-</div>
+              <Link
+                to="/admin/change-password"
+                className="block w-full px-4 py-3 text-left text-sm hover:bg-accent"
+              >
+                🔒 Change Password
+              </Link>
+            </div>
+          </div>
         </header>
         <main className="flex-1 p-4 md:p-6">
           <Outlet />
@@ -179,7 +160,15 @@ export function DashboardLayout({ title, allow, nav }: Props) {
   );
 }
 
-export function PageHeader({ title, description, action }: { title: string; description?: string; action?: ReactNode }) {
+export function PageHeader({
+  title,
+  description,
+  action,
+}: {
+  title: string;
+  description?: string;
+  action?: ReactNode;
+}) {
   return (
     <div className="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
       <div className="min-w-0">

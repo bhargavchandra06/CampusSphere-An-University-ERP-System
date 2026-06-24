@@ -20,7 +20,11 @@ public class CorsConfig {
 
                 registry.addMapping("/**")
                         .allowedOrigins(
-                                "http://localhost:8080"
+                                "http://localhost:8080",
+                                 "http://campussphere-frontend.s3-website.ap-south-2.amazonaws.com",
+                                  "https://d1hibxfwe68v5l.cloudfront.net",
+                                   "https://campussphere.online",
+                                    "https://www.campussphere.online"
                         )
                         .allowedMethods(
                                 "*"
