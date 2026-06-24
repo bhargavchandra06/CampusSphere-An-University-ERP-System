@@ -1,0 +1,18 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      java: corretto21
+
+  pre_build:
+    commands:
+      - echo "Starting build..."
+
+  build:
+    commands:
+      - cd application
+      - mvn clean package -DskipTests
+
+artifacts:
+  files:
+    - application/target/*.jar
