@@ -40,3 +40,5 @@ jobs:
           region: ${{ secrets.AWS_REGION }}
           version_label: github-${{ github.run_number }}
           deployment_package: deploy.zip
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
