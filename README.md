@@ -10,6 +10,10 @@ The application follows a role-based architecture and is deployed on AWS with HT
 * Backend API: https://api.campussphere.online
 * Swagger UI: https://api.campussphere.online/swagger-ui/index.html
 
+**Live Demo-Video**
+* CampusSphere-Application-Demo : https://drive.google.com/file/d/12DwY8zTWh8HqmMSIRv7PQ6z1tXmE5OPg/view?usp=drivesdk
+* CampusSphere-AWS-Servicec-Demo : https://drive.google.com/file/d/1HkeyLEG5-EyzPXKateeE27_haKK6yeKg/view?usp=drivesdk
+
 ✨ Features
 
 CampusSphere provides dedicated modules for administrators, faculty members, and students, ensuring efficient management of academic activities and secure access to resources.
