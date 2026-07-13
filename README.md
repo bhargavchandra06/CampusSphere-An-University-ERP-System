@@ -178,7 +178,7 @@ CampusSphere follows a normalized relational database design to efficiently mana
 -Admin-Dashboard
 
 
-![admin-change-password.png](screenshots/admin/admin-change-password.png)
+![admin-change-password.png](screenshots/admin/admin-dashboard.png)
 
 
 -Admin-courses
